@@ -6,9 +6,39 @@ import {
   InvoicesTable,
   LatestInvoiceRaw,
   User,
+  Account,
   Revenue,
 } from './definitions';
 import { formatCurrency } from './utils';
+
+export async function fetchUser() {
+  try {
+    const data = await sql<Account>`
+    SELECT
+      id,
+      nickname,
+      email,
+      password
+    FROM accounts
+    ORDER BY name ASC
+  `;
+  //   const data = await sql<User>`
+  //   SELECT
+  //     id,
+  //     name,
+  //     email,
+  //     password
+  //   FROM users
+  //   ORDER BY name ASC
+  // `;
+
+  const account = data.rows;
+  return account;
+  } catch (err) {
+    console.error('Database Error:', err);
+    // throw new Error('Failed to fetch all users.');
+  }
+}
 
 export async function fetchRevenue() {
   // Add noStore() here prevent the response from being cached.
@@ -224,6 +254,16 @@ export async function getUser(email: string) {
   try {
     const user = await sql`SELECT * FROM users WHERE email=${email}`;
     return user.rows[0] as User;
+  } catch (error) {
+    console.error('Failed to fetch user:', error);
+    throw new Error('Failed to fetch user.');
+  }
+}
+
+export async function getAccount(email: string) {
+  try {
+    const user = await sql`SELECT * FROM accounts WHERE email=${email}`;
+    return user.rows[0] as Account;
   } catch (error) {
     console.error('Failed to fetch user:', error);
     throw new Error('Failed to fetch user.');
